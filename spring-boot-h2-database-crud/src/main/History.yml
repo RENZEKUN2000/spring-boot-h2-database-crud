@@ -1,0 +1,34 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+
+      - name: Build and test
+        run: |
+          ./gradlew clean
+          ./gradlew test
+
+      - name: Generate Changelog
+        run: |
+          git fetch --tags
+          changelog=$(./generate-changelog.sh) # 使用自动化脚本生成更改日志
+          echo "Changelog: $changelog"
+        id: changelog
+
+      - name: Create Release
+        id: create_release

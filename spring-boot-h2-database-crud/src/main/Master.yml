@@ -1,0 +1,39 @@
+name: Documentation CI/CD
+
+on:
+  push:
+    branches:
+      - main  # 触发分支
+
+jobs:
+  build-and-publish-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python  # 这是一个示例，可以根据您的项目选择合适的环境
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # 设置所需的Python版本
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt  # 安装项目所需的依赖项
+        working-directory: ./your_project_directory
+
+      - name: Generate documentation
+        run: |
+          your_documentation_tool generate -o ./docs  # 使用文档工具生成文档
+        working-directory: ./your_project_directory
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          mkdocs gh-deploy --clean  # 发布到GitHub Pages
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}  # 需要在GitHub仓库的secrets中设置DEPLOY_KEY
+        working-directory: ./docs  # 设置工作目录为文档目录
+
